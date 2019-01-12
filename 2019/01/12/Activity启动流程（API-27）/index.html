@@ -7,7 +7,7 @@
     
 
     <title>
-      Archives 
+      Activity启动流程（API-27） | zehua_chen 
     </title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -16,15 +16,18 @@
     
     
 
-    <meta name="description" content="网站描述">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Archives">
-<meta property="og:url" content="https://czhua.github.io/archives/index.html">
+    <meta name="description" content="注意：Android8.0以后和AMS等Service之间的通信采用AIDL的方式，删除了之前的AMS代理类ActivityManagerProxy，ActivityManagerNative类也添加了@Deprecated弃用注解，用IActivityManager.aidl代替，8.0之前采用的是类似AIDL的形式进行通信，其他流程和之前都差不多，没有太大变动">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Activity启动流程（API-27） | zehua_chen">
+<meta property="og:url" content="https://czhua.github.io/2019/01/12/Activity启动流程（API-27）/index.html">
 <meta property="og:site_name" content="zehua_chen">
-<meta property="og:description" content="网站描述">
+<meta property="og:description" content="注意：Android8.0以后和AMS等Service之间的通信采用AIDL的方式，删除了之前的AMS代理类ActivityManagerProxy，ActivityManagerNative类也添加了@Deprecated弃用注解，用IActivityManager.aidl代替，8.0之前采用的是类似AIDL的形式进行通信，其他流程和之前都差不多，没有太大变动">
+<meta property="og:image" content="https://czhua.github.io/./files/img/Activity启动流程_API-27.svg">
+<meta property="og:updated_time" content="2019-01-12T09:08:37.899Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Archives">
-<meta name="twitter:description" content="网站描述">
+<meta name="twitter:title" content="Activity启动流程（API-27） | zehua_chen">
+<meta name="twitter:description" content="注意：Android8.0以后和AMS等Service之间的通信采用AIDL的方式，删除了之前的AMS代理类ActivityManagerProxy，ActivityManagerNative类也添加了@Deprecated弃用注解，用IActivityManager.aidl代替，8.0之前采用的是类似AIDL的形式进行通信，其他流程和之前都差不多，没有太大变动">
+<meta name="twitter:image" content="https://czhua.github.io/./files/img/Activity启动流程_API-27.svg">
     
     
     
@@ -188,118 +191,59 @@ classes that you can use:
         <div class="content-wrapper__inner entry">
             
 
+<article class="post-container post-container--single">
 
-   <!-- do nothing -->
-
-
-<div class="main-post-list">
-    <ol class="post-list">
+  <header class="post-header">
     
-    
-    <li>
+    <h1 class="post-title">Activity启动流程（API-27）</h1>
 
-      <h2 class="post-list__post-title post-title">
-        <a href="/2019/01/12/Activity启动流程（API-27）/" title="link to Activity启动流程（API-27）">Activity启动流程（API-27）</a>
-      </h2>
-
-      <div class="post-list__meta">
-
-        <time datetime="2019-01-12" class="post-list__meta--date date">2019-01-12</time> 
-      </div>
-
-      <div class="excerpt">
-        
-      </div>
-
-      <hr class="post-list__divider" />
-    </li>
-    
-    <li>
-
-      <h2 class="post-list__post-title post-title">
-        <a href="/2019/01/11/AIDL-笔记-1/" title="link to AIDL-笔记">AIDL-笔记</a>
-      </h2>
-
-      <div class="post-list__meta">
-
-        <time datetime="2019-01-11" class="post-list__meta--date date">2019-01-11</time> 
-      </div>
-
-      <div class="excerpt">
-        
-      </div>
-
-      <hr class="post-list__divider" />
-    </li>
-    
-    <li>
-
-      <h2 class="post-list__post-title post-title">
-        <a href="/2018/12/29/算法笔记/" title="link to 算法笔记">算法笔记</a>
-      </h2>
-
-      <div class="post-list__meta">
-
-        <time datetime="2018-12-29" class="post-list__meta--date date">2018-12-29</time> 
-      </div>
-
-      <div class="excerpt">
-        
-      </div>
-
-      <hr class="post-list__divider" />
-    </li>
-    
-    <li>
-
-      <h2 class="post-list__post-title post-title">
-        <a href="/2016/09/21/testMyBlog/" title="link to testMyBlog">testMyBlog</a>
-      </h2>
-
-      <div class="post-list__meta">
-
-        <time datetime="2016-09-21" class="post-list__meta--date date">2016-09-21</time> 
-      </div>
-
-      <div class="excerpt">
-        
-      </div>
-
-      <hr class="post-list__divider" />
-    </li>
-    
-    <li>
-
-      <h2 class="post-list__post-title post-title">
-        <a href="/2016/09/21/hello-world/" title="link to Hello World">Hello World</a>
-      </h2>
-
-      <div class="post-list__meta">
-
-        <time datetime="2016-09-21" class="post-list__meta--date date">2016-09-21</time> 
-      </div>
-
-      <div class="excerpt">
-        
-      </div>
-
-      <hr class="post-list__divider" />
-    </li>
-    
-  </ol>
-
-  <hr class="post-list__divider " />
-
-<nav class="pagination" role="navigation">
     
 
-    <span class="pagination__page-number"> 1 / 1</span>
+    <div class="post-meta">
+      <time datetime="2019-01-12" class="post-meta__date date">2019-01-12</time> 
+
+      <span class="post-meta__tags tags">
+
+          
+
+          
+
+      </span>
+    </div>
     
     
-</nav>
+
+  </header>
+
+  <section id="post-content" class="article-content post">
+    <blockquote>
+<p>注意：Android8.0以后和AMS等Service之间的通信采用AIDL的方式，删除了之前的AMS代理类<code>ActivityManagerProxy</code>，<code>ActivityManagerNative</code>类也添加了<code>@Deprecated</code>弃用注解，用<code>IActivityManager.aidl</code>代替，8.0之前采用的是类似AIDL的形式进行通信，其他流程和之前都差不多，没有太大变动</p>
+</blockquote>
+<p><img src="./files/img/Activity启动流程_API-27.svg" alt="Activity启动流程_API-27"></p>
+
+  </section>
+
+  
+
+<section class="post-comments">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      var disqus_shortname = 'letian'; 
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</section>
 
 
-</div>
+  
+</article>
+
+
             <footer class="footer">
 
     <span class="footer__copyright">&copy; 2016-2017. | <a href="http://chenzehua.cn/">陈泽华</a> | zehua_chan</span>
@@ -327,6 +271,18 @@ classes that you can use:
 
 
     
+
+    <script src="/js/awesome-toc.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $.awesome_toc({
+                overlay: true,
+                contentId: "post-content",
+            });
+        });
+    </script>
+
+
     
     
     <!--kill ie6 -->
