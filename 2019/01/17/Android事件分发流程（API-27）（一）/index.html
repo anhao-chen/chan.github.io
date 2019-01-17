@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    
+
+    <title>
+      Android事件分发流程（API-27）（一） | zehua_chen 
+    </title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    
+      <meta name="author" content="zh_chan">
+    
+    
+
+    <meta name="description" content="一个点击引起的世界大战
+
+有一个WMS（WindowManagerService）的大管家掌管着Android系统的键盘消息，他有个属性叫mInputManager（IMS，InputManagerService），是Android的输入管理器，属于Java层输入管理器，同时他指向着C++层中的输入管理器InputManager来监控系统的键盘消息（来自《Android系统源代码情景分析 第三版">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android事件分发流程（API-27）（一） | zehua_chen">
+<meta property="og:url" content="https://czhua.github.io/2019/01/17/Android事件分发流程（API-27）（一）/index.html">
+<meta property="og:site_name" content="zehua_chen">
+<meta property="og:description" content="一个点击引起的世界大战
+
+有一个WMS（WindowManagerService）的大管家掌管着Android系统的键盘消息，他有个属性叫mInputManager（IMS，InputManagerService），是Android的输入管理器，属于Java层输入管理器，同时他指向着C++层中的输入管理器InputManager来监控系统的键盘消息（来自《Android系统源代码情景分析 第三版">
+<meta property="og:image" content="https://czhua.github.io/./Android事件分发流程（API-27）（一）/Android触摸流程.jpg">
+<meta property="og:updated_time" content="2019-01-17T11:59:58.581Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android事件分发流程（API-27）（一） | zehua_chen">
+<meta name="twitter:description" content="一个点击引起的世界大战
+
+有一个WMS（WindowManagerService）的大管家掌管着Android系统的键盘消息，他有个属性叫mInputManager（IMS，InputManagerService），是Android的输入管理器，属于Java层输入管理器，同时他指向着C++层中的输入管理器InputManager来监控系统的键盘消息（来自《Android系统源代码情景分析 第三版">
+<meta name="twitter:image" content="https://czhua.github.io/./Android事件分发流程（API-27）（一）/Android触摸流程.jpg">
+    
+    
+    
+      <link rel="icon" type="image/x-icon" href="/favicon.png">
+    
+    <link rel="stylesheet" href="/css/uno.css">
+    <link rel="stylesheet" href="/css/highlight.css">
+    <link rel="stylesheet" href="/css/archive.css">
+    <link rel="stylesheet" href="/css/china-social-icon.css">
+
+</head>
+<body>
+
+    <span class="mobile btn-mobile-menu">
+        <i class="icon icon-list btn-mobile-menu__icon"></i>
+        <i class="icon icon-x-circle btn-mobile-close__icon hidden"></i>
+    </span>
+
+    
+
+<header class="panel-cover panel-cover--collapsed">
+
+
+  <div class="panel-main">
+
+  
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+
+        
+
+        <h1 class="panel-cover__title panel-title"><a href="/" title="link to homepage">zehua_chen</a></h1>
+        <hr class="panel-cover__divider" />
+
+        
+        <p class="panel-cover__description">
+          chan
+        </p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+
+        <div class="navigation-wrapper">
+
+          <nav class="cover-navigation cover-navigation--primary">
+            <ul class="navigation">
+
+              
+                
+                <li class="navigation__item"><a href="/#blog" title="" class="blog-button">首页</a></li>
+              
+                
+                <li class="navigation__item"><a href="/about" title="" class="">关于</a></li>
+              
+                
+                <li class="navigation__item"><a href="/archive" title="" class="">归档</a></li>
+              
+
+            </ul>
+          </nav>
+
+          <!-- ----------------------------
+To add a new social icon simply duplicate one of the list items from below
+and change the class in the <i> tag to match the desired social network
+and then add your link to the <a>. Here is a full list of social network
+classes that you can use:
+
+    icon-social-500px
+    icon-social-behance
+    icon-social-delicious
+    icon-social-designer-news
+    icon-social-deviant-art
+    icon-social-digg
+    icon-social-dribbble
+    icon-social-facebook
+    icon-social-flickr
+    icon-social-forrst
+    icon-social-foursquare
+    icon-social-github
+    icon-social-google-plus
+    icon-social-hi5
+    icon-social-instagram
+    icon-social-lastfm
+    icon-social-linkedin
+    icon-social-medium
+    icon-social-myspace
+    icon-social-path
+    icon-social-pinterest
+    icon-social-rdio
+    icon-social-reddit
+    icon-social-skype
+    icon-social-spotify
+    icon-social-stack-overflow
+    icon-social-steam
+    icon-social-stumbleupon
+    icon-social-treehouse
+    icon-social-tumblr
+    icon-social-twitter
+    icon-social-vimeo
+    icon-social-xbox
+    icon-social-yelp
+    icon-social-youtube
+    icon-social-zerply
+    icon-mail
+
+-------------------------------->
+
+<!-- add social info here -->
+
+
+
+<nav class="cover-navigation navigation--social">
+  <ul class="navigation">
+
+    
+      <!-- Github -->
+      <li class="navigation__item">
+        <a href="https://github.com/czhua" title="Huno on GitHub">
+          <i class='icon icon-social-github'></i>
+          <span class="label">GitHub</span>
+        </a>
+      </li>
+    
+
+    <!-- China social icon -->
+    <!--
+    
+      <li class="navigation__item">
+        <a href="" title="">
+          <i class='icon cs-icon-douban'></i>
+          <span class="label">Douban</span>
+        </a>
+      </li>
+
+      <li class="navigation__item">
+        <a href="" title="">
+          <i class='icon cs-icon-weibo'></i>
+          <span class="label">Weibo</span>
+        </a>
+      </li>
+
+    -->
+
+
+
+  </ul>
+</nav>
+
+
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="panel-cover--overlay"></div>
+  </div>
+</header>
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner entry">
+            
+
+<article class="post-container post-container--single">
+
+  <header class="post-header">
+    
+    <h1 class="post-title">Android事件分发流程（API-27）（一）</h1>
+
+    
+
+    <div class="post-meta">
+      <time datetime="2019-01-17" class="post-meta__date date">2019-01-17</time> 
+
+      <span class="post-meta__tags tags">
+
+          
+
+          
+
+      </span>
+    </div>
+    
+    
+
+  </header>
+
+  <section id="post-content" class="article-content post">
+    <blockquote>
+<p>一个点击引起的世界大战</p>
+</blockquote>
+<p>有一个<code>WMS（WindowManagerService）</code>的大管家掌管着Android系统的键盘消息，他有个属性叫<code>mInputManager（IMS，InputManagerService）</code>，是Android的输入管理器，属于Java层输入管理器，同时他指向着C++层中的输入管理器<code>InputManager</code>来监控系统的键盘消息（来自《Android系统源代码情景分析 第三版》）</p>
+<p>当我们在屏幕上的点击，经过WMS，IMS，到native层，最后会回调到Java层的<code>InputEventReceiver.dispatchInputEvent(int seq, InputEvent event, int displayId)</code>，一步步调用到<code>Activity.dispatchTouchEvent()</code></p>
+<ul>
+<li><p>序列图</p>
+<p><img src="./Android事件分发流程（API-27）（一）/Android触摸流程.jpg" alt="Android触摸流程"></p>
+</li>
+<li><p><code>InputEventReceiver.dispatchInputEvent(int seq, InputEvent event, int displayId)</code></p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Called from native code.</span></div><div class="line"><span class="meta">@SuppressWarnings</span>(<span class="string">"unused"</span>)</div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">dispatchInputEvent</span><span class="params">(<span class="keyword">int</span> seq, InputEvent event, <span class="keyword">int</span> displayId)</span> </span>&#123;</div><div class="line">    mSeqMap.put(event.getSequenceNumber(), seq);</div><div class="line">    onInputEvent(event, displayId);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p><code>InputEventReceiver</code>是<code>abstract class</code>，在<code>ViewRootImpl</code>中有个内部类叫<code>WindowInputEventReceiver</code>继承<code>InputEventReceiver</code></p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">WindowInputEventReceiver</span> <span class="keyword">extends</span> <span class="title">InputEventReceiver</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">WindowInputEventReceiver</span><span class="params">(InputChannel inputChannel, Looper looper)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(inputChannel, looper);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onInputEvent</span><span class="params">(InputEvent event, <span class="keyword">int</span> displayId)</span> </span>&#123;</div><div class="line">        <span class="comment">// native 回调在这里</span></div><div class="line">        enqueueInputEvent(event, <span class="keyword">this</span>, <span class="number">0</span>, <span class="keyword">true</span>);</div><div class="line">    &#125;</div><div class="line">	...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p><code>onInputEvent()</code>方法中调用<code>enqueueInputEvent()</code></p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">enqueueInputEvent</span><span class="params">(InputEvent event,</span></span></div><div class="line">                       InputEventReceiver receiver, <span class="keyword">int</span> flags, <span class="keyword">boolean</span> processImmediately) &#123;</div><div class="line">    adjustInputEventForCompatibility(event);</div><div class="line">    QueuedInputEvent q = obtainQueuedInputEvent(event, receiver, flags);</div><div class="line"></div><div class="line">    <span class="comment">// Always enqueue the input event in order, regardless of its time stamp.</span></div><div class="line">    <span class="comment">// We do this because the application or the IME may inject key events</span></div><div class="line">    <span class="comment">// in response to touch events and we want to ensure that the injected keys</span></div><div class="line">    <span class="comment">// are processed in the order they were received and we cannot trust that</span></div><div class="line">    <span class="comment">// the time stamp of injected events are monotonic.</span></div><div class="line">    QueuedInputEvent last = mPendingInputEventTail;</div><div class="line">    <span class="keyword">if</span> (last == <span class="keyword">null</span>) &#123;</div><div class="line">        mPendingInputEventHead = q;</div><div class="line">        mPendingInputEventTail = q;</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        last.mNext = q;</div><div class="line">        mPendingInputEventTail = q;</div><div class="line">    &#125;</div><div class="line">    mPendingInputEventCount += <span class="number">1</span>;</div><div class="line">    Trace.traceCounter(Trace.TRACE_TAG_INPUT, mPendingInputEventQueueLengthCounterName,</div><div class="line">                       mPendingInputEventCount);</div><div class="line">	<span class="comment">// 上面的传参是true，调用doProcessInputEvents()</span></div><div class="line">    <span class="keyword">if</span> (processImmediately) &#123;</div><div class="line">        doProcessInputEvents();</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        scheduleProcessInputEvents();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>进入<code>doProcessInputEvents</code></p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">doProcessInputEvents</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="comment">// Deliver all pending input events in the queue.</span></div><div class="line">    <span class="keyword">while</span> (mPendingInputEventHead != <span class="keyword">null</span>) &#123;</div><div class="line">        QueuedInputEvent q = mPendingInputEventHead;</div><div class="line">        mPendingInputEventHead = q.mNext;</div><div class="line">        <span class="keyword">if</span> (mPendingInputEventHead == <span class="keyword">null</span>) &#123;</div><div class="line">            mPendingInputEventTail = <span class="keyword">null</span>;</div><div class="line">        &#125;</div><div class="line">        q.mNext = <span class="keyword">null</span>;</div><div class="line"></div><div class="line">        mPendingInputEventCount -= <span class="number">1</span>;</div><div class="line">        Trace.traceCounter(Trace.TRACE_TAG_INPUT, mPendingInputEventQueueLengthCounterName,</div><div class="line">                           mPendingInputEventCount);</div><div class="line"></div><div class="line">        <span class="keyword">long</span> eventTime = q.mEvent.getEventTimeNano();</div><div class="line">        <span class="keyword">long</span> oldestEventTime = eventTime;</div><div class="line">        <span class="keyword">if</span> (q.mEvent <span class="keyword">instanceof</span> MotionEvent) &#123;</div><div class="line">            MotionEvent me = (MotionEvent)q.mEvent;</div><div class="line">            <span class="keyword">if</span> (me.getHistorySize() &gt; <span class="number">0</span>) &#123;</div><div class="line">                oldestEventTime = me.getHistoricalEventTimeNano(<span class="number">0</span>);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        mChoreographer.mFrameInfo.updateInputEventTime(eventTime, oldestEventTime);</div><div class="line">		</div><div class="line">        <span class="comment">// 到这</span></div><div class="line">        deliverInputEvent(q);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// We are done processing all input events that we can process right now</span></div><div class="line">    <span class="comment">// so we can clear the pending flag immediately.</span></div><div class="line">    <span class="keyword">if</span> (mProcessInputEventsScheduled) &#123;</div><div class="line">        mProcessInputEventsScheduled = <span class="keyword">false</span>;</div><div class="line">        mHandler.removeMessages(MSG_PROCESS_INPUT_EVENTS);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>进入<code>deliverInputEvent()</code></p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">deliverInputEvent</span><span class="params">(QueuedInputEvent q)</span> </span>&#123;</div><div class="line">    Trace.asyncTraceBegin(Trace.TRACE_TAG_VIEW, <span class="string">"deliverInputEvent"</span>,</div><div class="line">                          q.mEvent.getSequenceNumber());</div><div class="line">    <span class="keyword">if</span> (mInputEventConsistencyVerifier != <span class="keyword">null</span>) &#123;</div><div class="line">        mInputEventConsistencyVerifier.onInputEvent(q.mEvent, <span class="number">0</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    InputStage stage;</div><div class="line">    <span class="keyword">if</span> (q.shouldSendToSynthesizer()) &#123;</div><div class="line">        stage = mSyntheticInputStage;</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        stage = q.shouldSkipIme() ? mFirstPostImeInputStage : mFirstInputStage;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (stage != <span class="keyword">null</span>) &#123;</div><div class="line">        <span class="comment">// 到这</span></div><div class="line">        stage.deliver(q);</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        finishInputEvent(q);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>这里的<code>stage</code>是<code>ViewPostImeInputStage</code>继承<code>InputStage</code></p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">     * Delivers post-ime input events to the view hierarchy.</div><div class="line">     */</div><div class="line"><span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ViewPostImeInputStage</span> <span class="keyword">extends</span> <span class="title">InputStage</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ViewPostImeInputStage</span><span class="params">(InputStage next)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(next);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">onProcess</span><span class="params">(QueuedInputEvent q)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (q.mEvent <span class="keyword">instanceof</span> KeyEvent) &#123;</div><div class="line">            <span class="keyword">return</span> processKeyEvent(q);</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="keyword">final</span> <span class="keyword">int</span> source = q.mEvent.getSource();</div><div class="line">            <span class="keyword">if</span> ((source &amp; InputDevice.SOURCE_CLASS_POINTER) != <span class="number">0</span>) &#123;</div><div class="line">                <span class="keyword">return</span> processPointerEvent(q);</div><div class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> ((source &amp; InputDevice.SOURCE_CLASS_TRACKBALL) != <span class="number">0</span>) &#123;</div><div class="line">                <span class="keyword">return</span> processTrackballEvent(q);</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                <span class="keyword">return</span> processGenericMotionEvent(q);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    ...</div><div class="line">        </div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">processPointerEvent</span><span class="params">(QueuedInputEvent q)</span> </span>&#123;</div><div class="line">        <span class="keyword">final</span> MotionEvent event = (MotionEvent)q.mEvent;</div><div class="line"></div><div class="line">        mAttachInfo.mUnbufferedDispatchRequested = <span class="keyword">false</span>;</div><div class="line">        mAttachInfo.mHandlingPointerEvent = <span class="keyword">true</span>;</div><div class="line">        <span class="comment">// 这里的mView是DecorView</span></div><div class="line">        <span class="keyword">boolean</span> handled = mView.dispatchPointerEvent(event);</div><div class="line">        maybeUpdatePointerIcon(event);</div><div class="line">        maybeUpdateTooltip(event);</div><div class="line">        mAttachInfo.mHandlingPointerEvent = <span class="keyword">false</span>;</div><div class="line">        <span class="keyword">if</span> (mAttachInfo.mUnbufferedDispatchRequested &amp;&amp; !mUnbufferedInputDispatch) &#123;</div><div class="line">            mUnbufferedInputDispatch = <span class="keyword">true</span>;</div><div class="line">            <span class="keyword">if</span> (mConsumeBatchedInputScheduled) &#123;</div><div class="line">                scheduleConsumeBatchedInputImmediately();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> handled ? FINISH_HANDLED : FORWARD;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p><code>dispatchPointerEvent</code>在view中实现</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * Dispatch a pointer event.</div><div class="line"> * &lt;p&gt;</div><div class="line"> * Dispatches touch related pointer events to &#123;<span class="doctag">@link</span> #onTouchEvent(MotionEvent)&#125; and all</div><div class="line"> * other events to &#123;<span class="doctag">@link</span> #onGenericMotionEvent(MotionEvent)&#125;.  This separation of concerns</div><div class="line"> * reinforces the invariant that &#123;<span class="doctag">@link</span> #onTouchEvent(MotionEvent)&#125; is really about touches</div><div class="line"> * and should not be expected to handle other pointing device features.</div><div class="line"> * &lt;/p&gt;</div><div class="line"> *</div><div class="line"> * <span class="doctag">@param</span> event The motion event to be dispatched.</div><div class="line"> * <span class="doctag">@return</span> True if the event was handled by the view, false otherwise.</div><div class="line"> * <span class="doctag">@hide</span></div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">dispatchPointerEvent</span><span class="params">(MotionEvent event)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (event.isTouchEvent()) &#123;</div><div class="line">        <span class="comment">// 调用dispatchTouchEvent</span></div><div class="line">        <span class="keyword">return</span> dispatchTouchEvent(event);</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        <span class="keyword">return</span> dispatchGenericMotionEvent(event);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p><code>dispatchTouchEvent</code>，注意这里的Window.Callback就是Activity，</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">dispatchTouchEvent</span><span class="params">(MotionEvent ev)</span> </span>&#123;</div><div class="line">    <span class="keyword">final</span> Window.Callback cb = mWindow.getCallback();</div><div class="line">    <span class="keyword">return</span> cb != <span class="keyword">null</span> &amp;&amp; !mWindow.isDestroyed() &amp;&amp; mFeatureId &lt; <span class="number">0</span></div><div class="line">        ? cb.dispatchTouchEvent(ev) : <span class="keyword">super</span>.dispatchTouchEvent(ev);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>到<code>Activity.dispatchTouchEvent</code></p>
+<p>​    </p>
+</li>
+</ul>
+<p><code>Activity.dispatchTouchEvent()</code>之后就是我们熟悉的事件分发了</p>
+<p>详情见<a href="">Android事件分发流程（API-27）（二）</a>，敬请期待…</p>
+<ul>
+<li>参考资料<ul>
+<li>《Android系统源代码情景分析 第三版》</li>
+<li><a href="https://www.jianshu.com/p/8bd40df31d43" target="_blank" rel="external">从你触摸屏幕开始分析android触摸事件分发</a></li>
+</ul>
+</li>
+</ul>
+
+  </section>
+
+  
+
+<section class="post-comments">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      var disqus_shortname = 'letian'; 
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</section>
+
+
+  
+</article>
+
+
+            <footer class="footer">
+
+    <span class="footer__copyright">&copy; 2016-2017. | <a href="http://chenzehua.cn/">陈泽华</a> | zehua_chan</span>
+    
+</footer>
+        </div>
+    </div>
+
+    <!-- js files -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="/js/scale.fix.js"></script>
+    
+
+    
+
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript"> 
+        $(document).ready(function(){
+            MathJax.Hub.Config({ 
+                tex2jax: {inlineMath: [['[latex]','[/latex]'], ['\\(','\\)']]} 
+            });
+        });
+    </script>
+
+
+    
+
+    <script src="/js/awesome-toc.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $.awesome_toc({
+                overlay: true,
+                contentId: "post-content",
+            });
+        });
+    </script>
+
+
+    
+    
+    <!--kill ie6 -->
+<!--[if IE 6]>
+  <script src="//letskillie6.googlecode.com/svn/trunk/2/zh_CN.js"></script>
+<![endif]-->
+
+</body>
+</html>
