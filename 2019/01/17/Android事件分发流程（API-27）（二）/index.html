@@ -32,11 +32,11 @@ Activity分发流程
 
 Activity.dispatchTouchEvent()
 1234567891011public boolean dispatchTo">
-<meta property="og:image" content="https://czhua.github.io/./Android事件分发流程（API-27）（二）/Activity事件分发流程.jpg">
-<meta property="og:image" content="https://czhua.github.io/./Android事件分发流程（API-27）（二）/ViewGroup事件分发流程.jpg">
-<meta property="og:image" content="https://czhua.github.io/./Android事件分发流程（API-27）（二）/View事件分发流程.jpg">
-<meta property="og:image" content="https://czhua.github.io/./Android事件分发流程（API-27）（二）/Android事件分发泳道图.jpg">
-<meta property="og:updated_time" content="2019-01-17T11:59:31.384Z">
+<meta property="og:image" content="https://czhua.github.io/Activity事件分发流程.jpg">
+<meta property="og:image" content="https://czhua.github.io/ViewGroup事件分发流程.jpg">
+<meta property="og:image" content="https://czhua.github.io/View事件分发流程.jpg">
+<meta property="og:image" content="https://czhua.github.io/Android事件分发泳道图.jpg">
+<meta property="og:updated_time" content="2019-01-17T12:08:09.197Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android事件分发流程（API-27）（二） | zehua_chen">
 <meta name="twitter:description" content="在Android事件分发流程（API-27）（1）中我们有分析到当我们在屏幕的一个点击会走到Activity.dispatchTouchEvent()，现在我们分析Actvitiy.dispatchTouchEvent()之后的流程
@@ -45,7 +45,7 @@ Activity分发流程
 
 Activity.dispatchTouchEvent()
 1234567891011public boolean dispatchTo">
-<meta name="twitter:image" content="https://czhua.github.io/./Android事件分发流程（API-27）（二）/Activity事件分发流程.jpg">
+<meta name="twitter:image" content="https://czhua.github.io/Activity事件分发流程.jpg">
     
     
     
@@ -257,7 +257,7 @@ classes that you can use:
 <p>所以<code>Activity.onTouchEvent()</code>主要是判断是否在Window的区域之外，如果在区域之外则<code>finish</code>当前<code>Activity</code>，并返回<code>true</code>，否则返回<code>false</code>，总之到这里<code>Activity</code>的<code>dispatchTouchEvent</code>的事件分发流程就结束了</p>
 </li>
 <li><p>流程图</p>
-<p><img src="./Android事件分发流程（API-27）（二）/Activity事件分发流程.jpg" alt=""></p>
+<p><img src="Activity事件分发流程.jpg" alt=""></p>
 </li>
 </ul>
 </li>
@@ -276,7 +276,7 @@ classes that you can use:
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onInterceptTouchEvent</span><span class="params">(MotionEvent ev)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (ev.isFromSource(InputDevice.SOURCE_MOUSE)</div><div class="line">        &amp;&amp; ev.getAction() == MotionEvent.ACTION_DOWN</div><div class="line">        &amp;&amp; ev.isButtonPressed(MotionEvent.BUTTON_PRIMARY)</div><div class="line">        &amp;&amp; isOnScrollbarThumb(ev.getX(), ev.getY())) &#123;</div><div class="line">        <span class="comment">// true拦截</span></div><div class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// false不拦截</span></div><div class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 </li>
 <li><p><code>ViewGroup</code>的分发流程相对较为复杂，简单流程图如下</p>
-<p><img src="./Android事件分发流程（API-27）（二）/ViewGroup事件分发流程.jpg" alt="ViewGroup事件分发流程"></p>
+<p><img src="ViewGroup事件分发流程.jpg" alt="ViewGroup事件分发流程"></p>
 </li>
 </ul>
 </li>
@@ -294,12 +294,12 @@ classes that you can use:
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">performClick</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">final</span> <span class="keyword">boolean</span> result;</div><div class="line">    <span class="keyword">final</span> ListenerInfo li = mListenerInfo;</div><div class="line">    <span class="keyword">if</span> (li != <span class="keyword">null</span> &amp;&amp; li.mOnClickListener != <span class="keyword">null</span>) &#123;</div><div class="line">        <span class="comment">// mClickListener不为空，即setOnClickListener()</span></div><div class="line">        playSoundEffect(SoundEffectConstants.CLICK);</div><div class="line">        <span class="comment">// 执行onClick方法</span></div><div class="line">        li.mOnClickListener.onClick(<span class="keyword">this</span>);</div><div class="line">        result = <span class="keyword">true</span>;</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        result = <span class="keyword">false</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_CLICKED);</div><div class="line"></div><div class="line">    notifyEnterOrExitForAutoFillIfNeeded(<span class="keyword">true</span>);</div><div class="line">	<span class="comment">// 默认返回false</span></div><div class="line">    <span class="keyword">return</span> result;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 </li>
 <li><p>流程图</p>
-<p><img src="./Android事件分发流程（API-27）（二）/View事件分发流程.jpg" alt=""></p>
+<p><img src="View事件分发流程.jpg" alt=""></p>
 </li>
 </ul>
 </li>
 <li><p>整体流程</p>
-<p><img src="./Android事件分发流程（API-27）（二）/Android事件分发泳道图.jpg" alt=""></p>
+<p><img src="Android事件分发泳道图.jpg" alt=""></p>
 </li>
 <li><p>参考资料</p>
 <ul>
