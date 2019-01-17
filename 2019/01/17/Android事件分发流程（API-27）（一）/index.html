@@ -26,14 +26,14 @@
 <meta property="og:description" content="一个点击引起的世界大战
 
 有一个WMS（WindowManagerService）的大管家掌管着Android系统的键盘消息，他有个属性叫mInputManager（IMS，InputManagerService），是Android的输入管理器，属于Java层输入管理器，同时他指向着C++层中的输入管理器InputManager来监控系统的键盘消息（来自《Android系统源代码情景分析 第三版">
-<meta property="og:image" content="https://czhua.github.io/./Android事件分发流程（API-27）（一）/Android触摸流程.jpg">
-<meta property="og:updated_time" content="2019-01-17T11:59:58.581Z">
+<meta property="og:image" content="https://czhua.github.io/Android触摸流程.jpg">
+<meta property="og:updated_time" content="2019-01-17T12:05:57.439Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android事件分发流程（API-27）（一） | zehua_chen">
 <meta name="twitter:description" content="一个点击引起的世界大战
 
 有一个WMS（WindowManagerService）的大管家掌管着Android系统的键盘消息，他有个属性叫mInputManager（IMS，InputManagerService），是Android的输入管理器，属于Java层输入管理器，同时他指向着C++层中的输入管理器InputManager来监控系统的键盘消息（来自《Android系统源代码情景分析 第三版">
-<meta name="twitter:image" content="https://czhua.github.io/./Android事件分发流程（API-27）（一）/Android触摸流程.jpg">
+<meta name="twitter:image" content="https://czhua.github.io/Android触摸流程.jpg">
     
     
     
@@ -229,7 +229,7 @@ classes that you can use:
 <p>当我们在屏幕上的点击，经过WMS，IMS，到native层，最后会回调到Java层的<code>InputEventReceiver.dispatchInputEvent(int seq, InputEvent event, int displayId)</code>，一步步调用到<code>Activity.dispatchTouchEvent()</code></p>
 <ul>
 <li><p>序列图</p>
-<p><img src="./Android事件分发流程（API-27）（一）/Android触摸流程.jpg" alt="Android触摸流程"></p>
+<p><img src="Android触摸流程.jpg" alt="Android触摸流程"></p>
 </li>
 <li><p><code>InputEventReceiver.dispatchInputEvent(int seq, InputEvent event, int displayId)</code></p>
   <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Called from native code.</span></div><div class="line"><span class="meta">@SuppressWarnings</span>(<span class="string">"unused"</span>)</div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">dispatchInputEvent</span><span class="params">(<span class="keyword">int</span> seq, InputEvent event, <span class="keyword">int</span> displayId)</span> </span>&#123;</div><div class="line">    mSeqMap.put(event.getSequenceNumber(), seq);</div><div class="line">    onInputEvent(event, displayId);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
