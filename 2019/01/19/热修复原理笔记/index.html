@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    
+
+    <title>
+      热修复原理笔记 | zehua_chen 
+    </title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    
+      <meta name="author" content="zh_chan">
+    
+    
+
+    <meta name="description" content="学习资料：《Android进阶解密》
+
+常见的热修复框架有阿里的AndFix、Dexposed、阿里百川和Sophix，腾讯的微信Tinker、QQ空间的超级补丁和手Q的QFix，其他知名大厂的有美团的Robust、饿了么的Amigo、美丽说蘑菇街的Aceso，以及其他的RocooFix、Nuwa和AnoleFix等等。
+热修复框架的主要分为代码修复、资源修复和动态链接库修复，每个库使用修复的原">
+<meta property="og:type" content="article">
+<meta property="og:title" content="热修复原理笔记 | zehua_chen">
+<meta property="og:url" content="https://czhua.github.io/2019/01/19/热修复原理笔记/index.html">
+<meta property="og:site_name" content="zehua_chen">
+<meta property="og:description" content="学习资料：《Android进阶解密》
+
+常见的热修复框架有阿里的AndFix、Dexposed、阿里百川和Sophix，腾讯的微信Tinker、QQ空间的超级补丁和手Q的QFix，其他知名大厂的有美团的Robust、饿了么的Amigo、美丽说蘑菇街的Aceso，以及其他的RocooFix、Nuwa和AnoleFix等等。
+热修复框架的主要分为代码修复、资源修复和动态链接库修复，每个库使用修复的原">
+<meta property="og:updated_time" content="2019-01-19T11:12:33.682Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="热修复原理笔记 | zehua_chen">
+<meta name="twitter:description" content="学习资料：《Android进阶解密》
+
+常见的热修复框架有阿里的AndFix、Dexposed、阿里百川和Sophix，腾讯的微信Tinker、QQ空间的超级补丁和手Q的QFix，其他知名大厂的有美团的Robust、饿了么的Amigo、美丽说蘑菇街的Aceso，以及其他的RocooFix、Nuwa和AnoleFix等等。
+热修复框架的主要分为代码修复、资源修复和动态链接库修复，每个库使用修复的原">
+    
+    
+    
+      <link rel="icon" type="image/x-icon" href="/favicon.png">
+    
+    <link rel="stylesheet" href="/css/uno.css">
+    <link rel="stylesheet" href="/css/highlight.css">
+    <link rel="stylesheet" href="/css/archive.css">
+    <link rel="stylesheet" href="/css/china-social-icon.css">
+
+</head>
+<body>
+
+    <span class="mobile btn-mobile-menu">
+        <i class="icon icon-list btn-mobile-menu__icon"></i>
+        <i class="icon icon-x-circle btn-mobile-close__icon hidden"></i>
+    </span>
+
+    
+
+<header class="panel-cover panel-cover--collapsed">
+
+
+  <div class="panel-main">
+
+  
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+
+        
+
+        <h1 class="panel-cover__title panel-title"><a href="/" title="link to homepage">zehua_chen</a></h1>
+        <hr class="panel-cover__divider" />
+
+        
+        <p class="panel-cover__description">
+          chan
+        </p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+
+        <div class="navigation-wrapper">
+
+          <nav class="cover-navigation cover-navigation--primary">
+            <ul class="navigation">
+
+              
+                
+                <li class="navigation__item"><a href="/#blog" title="" class="blog-button">首页</a></li>
+              
+                
+                <li class="navigation__item"><a href="/about" title="" class="">关于</a></li>
+              
+                
+                <li class="navigation__item"><a href="/archive" title="" class="">归档</a></li>
+              
+
+            </ul>
+          </nav>
+
+          <!-- ----------------------------
+To add a new social icon simply duplicate one of the list items from below
+and change the class in the <i> tag to match the desired social network
+and then add your link to the <a>. Here is a full list of social network
+classes that you can use:
+
+    icon-social-500px
+    icon-social-behance
+    icon-social-delicious
+    icon-social-designer-news
+    icon-social-deviant-art
+    icon-social-digg
+    icon-social-dribbble
+    icon-social-facebook
+    icon-social-flickr
+    icon-social-forrst
+    icon-social-foursquare
+    icon-social-github
+    icon-social-google-plus
+    icon-social-hi5
+    icon-social-instagram
+    icon-social-lastfm
+    icon-social-linkedin
+    icon-social-medium
+    icon-social-myspace
+    icon-social-path
+    icon-social-pinterest
+    icon-social-rdio
+    icon-social-reddit
+    icon-social-skype
+    icon-social-spotify
+    icon-social-stack-overflow
+    icon-social-steam
+    icon-social-stumbleupon
+    icon-social-treehouse
+    icon-social-tumblr
+    icon-social-twitter
+    icon-social-vimeo
+    icon-social-xbox
+    icon-social-yelp
+    icon-social-youtube
+    icon-social-zerply
+    icon-mail
+
+-------------------------------->
+
+<!-- add social info here -->
+
+
+
+<nav class="cover-navigation navigation--social">
+  <ul class="navigation">
+
+    
+      <!-- Github -->
+      <li class="navigation__item">
+        <a href="https://github.com/czhua" title="Huno on GitHub">
+          <i class='icon icon-social-github'></i>
+          <span class="label">GitHub</span>
+        </a>
+      </li>
+    
+
+    <!-- China social icon -->
+    <!--
+    
+      <li class="navigation__item">
+        <a href="" title="">
+          <i class='icon cs-icon-douban'></i>
+          <span class="label">Douban</span>
+        </a>
+      </li>
+
+      <li class="navigation__item">
+        <a href="" title="">
+          <i class='icon cs-icon-weibo'></i>
+          <span class="label">Weibo</span>
+        </a>
+      </li>
+
+    -->
+
+
+
+  </ul>
+</nav>
+
+
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="panel-cover--overlay"></div>
+  </div>
+</header>
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner entry">
+            
+
+<article class="post-container post-container--single">
+
+  <header class="post-header">
+    
+    <h1 class="post-title">热修复原理笔记</h1>
+
+    
+
+    <div class="post-meta">
+      <time datetime="2019-01-19" class="post-meta__date date">2019-01-19</time> 
+
+      <span class="post-meta__tags tags">
+
+          
+
+          
+             &#8226; 标签:
+            <font class="tags">
+              <a class="tags-link" href="/tags/笔记/">笔记</a>
+            </font>
+          
+
+      </span>
+    </div>
+    
+    
+
+  </header>
+
+  <section id="post-content" class="article-content post">
+    <blockquote>
+<p>学习资料：《Android进阶解密》</p>
+</blockquote>
+<p>常见的热修复框架有阿里的AndFix、Dexposed、阿里百川和Sophix，腾讯的微信Tinker、QQ空间的超级补丁和手Q的QFix，其他知名大厂的有美团的Robust、饿了么的Amigo、美丽说蘑菇街的Aceso，以及其他的RocooFix、Nuwa和AnoleFix等等。</p>
+<p>热修复框架的主要分为<strong>代码修复</strong>、<strong>资源修复</strong>和<strong>动态链接库修复</strong>，每个库使用修复的原理都有所区别</p>
+<ul>
+<li><p>资源修复</p>
+<p>大多热修复框架的资源修复都参考了<strong>Instant Run</strong>的资源修复原理</p>
+<ul>
+<li><p>Instant Run部署三种方式</p>
+<ul>
+<li><p>Hot Swap</p>
+<p>效率最高的部署，代码的增量改变不需要重启App，甚至不需要重启当前的Activity，<strong>修改一个现有方法中的代码时会采用Hot Swap</strong></p>
+</li>
+<li><p>Warm Swap</p>
+<p>App不需重启，但Activity需要重启，<strong>修改或删除一个现有的资源文件会采用Warm Swap</strong></p>
+</li>
+<li><p>Cold Swap</p>
+<p>App需要重启，但不需要重新安装，采用Cold Swap的情况很多，比如添加、删除或修改一个字段和方法</p>
+</li>
+</ul>
+</li>
+<li><p>原理</p>
+<ul>
+<li>创建新的<code>AssetManager</code>，通过反射调用<code>addAssetPath</code>方法加载外部的资源，这样创建的<code>AssetManager</code>就含有了外部资源</li>
+<li>将<code>AssetManager</code>类型的<code>mAssets</code>字段的引用全部替换为创建新的<code>AssetManager</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>代码修复</p>
+<p>代码修复主要有三个方案，分别是<strong>类加载方案</strong>、<strong>底层替换方案</strong>和<strong>Instant Run方案</strong></p>
+<ul>
+<li><p>类加载方案</p>
+<p>类加载方案是基于<strong>Dex分包方案</strong>，</p>
+<ul>
+<li><p>Dex分包</p>
+<p>Dex分包主要是将应用代码分成多个dex文件，将应用启动时必须用到的类和这些类的直接引用类放到主Dex中，其他代码放到其他Dex中，从而解决Dex的65536问题和LinearAlloc限制。</p>
+<p>Dex分包方案主要有两种，分别是<strong>Google官方方案</strong>、<strong>Dex自动拆包及动态加载方案</strong></p>
+</li>
+</ul>
+<p><strong>类加载方案需要重启App</strong>后让ClassLoader重新加载新的类，因为类是无法被卸载的，要想重新加载新的类就需要重启App，因此<strong>采用类加载方案的热修复框架不能及时生效</strong>，采用类加载方案的的框架其实现方式也是有区别的，如QQ空间的超级补丁和Nuwa是按照将补丁包放在Element数组的第一个元素得到优先加载；微信Tinker将新旧Apk做diff，得到patch.dex，再将patch.dex与手机中APK的classes.dex做合并，生成新的classes.dex，然后在运行包时通过反射将classes.dex放在Element数组的第一个元素；饿了么的Amigo则是将补丁包中每个dex对应的Element取出来，之后组成新的Element数组，在运行时通过反射用新的Element数组替换掉现有的Element数组。<strong>Element数组指的是DexPathList的findClass方法中用的dexElements</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">/libcore/dalvik/src/main/java/dalvik/system/DexPathList.java</div><div class="line"><span class="comment">/**</span></div><div class="line"> * Finds the named class in one of the dex files pointed at by</div><div class="line"> * this instance. This will find the one in the earliest listed</div><div class="line"> * path element. If the class is found but has not yet been</div><div class="line"> * defined, then this method will define it in the defining</div><div class="line"> * context that this instance was constructed with.</div><div class="line"> *</div><div class="line"> * <span class="doctag">@param</span> name of class to find</div><div class="line"> * <span class="doctag">@param</span> suppressed exceptions encountered whilst finding the class</div><div class="line"> * <span class="doctag">@return</span> the named class or &#123;<span class="doctag">@code</span> null&#125; if the class is not</div><div class="line"> * found in any of the dex files</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> Class&lt;?&gt; findClass(String name, List&lt;Throwable&gt; suppressed) &#123;</div><div class="line">    <span class="keyword">for</span> (Element element : dexElements) &#123;</div><div class="line">        Class&lt;?&gt; clazz = element.findClass(name, definingContext, suppressed);</div><div class="line">        <span class="keyword">if</span> (clazz != <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">return</span> clazz;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (dexElementsSuppressedExceptions != <span class="keyword">null</span>) &#123;</div><div class="line">        suppressed.addAll(Arrays.asList(dexElementsSuppressedExceptions));</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>底层替换方案</p>
+<p><strong>底层替换方案不会再次加载新类</strong>，而是直接在Native层修改原有类，但在原有类上进行修改限制会比较多，不能增减原有类的方法和字段，底层替换方案可以立即生效不用重启。</p>
+<p>底层方案主要是<strong>替换ArtMethod结构体中的字段</strong>或者<strong>替换整个ArtMethod结构体</strong></p>
+<p>AndFix采用的是替换ArtMethod结构体中的字段，这样会有兼容问题，因为厂商可能会修改ArtMethod结构体，导致方法替换失败；Sophix采用的是替换整个ArtMethod结构体，这样不会存在兼容问题。</p>
+<p>ArtMethod结构体中包含了Java方法的所有信息，包括执行入口，访问权限、所属类和代码执行地址等</p>
+</li>
+<li><p>Instant Run方案</p>
+<p>使用ASM在每一个方法都注入一些代码</p>
+<p><strong>ASM</strong>：是一个Java字节码操作框架，它能够动态生成类或者增强现有类的功能。ASM可以直接产生class文件，也可以在类被加载到虚拟机前动态改变类的行为</p>
+</li>
+</ul>
+</li>
+<li><p>动态链接库的修复</p>
+<p>主要有两种方案：</p>
+<ul>
+<li>将so补丁插入到<code>NativeLibraryElement</code>数组的前部，让so补丁的路径先被返回和加载</li>
+<li>调用System的load方法来接管so的加载入口</li>
+</ul>
+</li>
+</ul>
+
+  </section>
+
+  
+
+<section class="post-comments">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      var disqus_shortname = 'letian'; 
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</section>
+
+
+  
+</article>
+
+
+            <footer class="footer">
+
+    <span class="footer__copyright">&copy; 2016-2017. | <a href="http://chenzehua.cn/">陈泽华</a> | zehua_chan</span>
+    
+</footer>
+        </div>
+    </div>
+
+    <!-- js files -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="/js/scale.fix.js"></script>
+    
+
+    
+
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript"> 
+        $(document).ready(function(){
+            MathJax.Hub.Config({ 
+                tex2jax: {inlineMath: [['[latex]','[/latex]'], ['\\(','\\)']]} 
+            });
+        });
+    </script>
+
+
+    
+
+    <script src="/js/awesome-toc.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $.awesome_toc({
+                overlay: true,
+                contentId: "post-content",
+            });
+        });
+    </script>
+
+
+    
+    
+    <!--kill ie6 -->
+<!--[if IE 6]>
+  <script src="//letskillie6.googlecode.com/svn/trunk/2/zh_CN.js"></script>
+<![endif]-->
+
+</body>
+</html>
